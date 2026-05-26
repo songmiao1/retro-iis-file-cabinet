@@ -68,6 +68,7 @@ http://服务器地址/a
 浏览器会把大文件切成 64 MB 的小块逐个上传，服务器收到最后一块后合并成完整文件。
 
 页面层面的上传上限是 10 GB。`web.config` 中单次请求限制保持在 200 MB 左右，用来配合分片上传，而不是一次性提交整个大文件。
+<img width="1144" height="755" alt="image" src="https://github.com/user-attachments/assets/ffac63da-03bf-440f-9b2b-b70f0d6874fd" />
 
 ## 注意事项
 
