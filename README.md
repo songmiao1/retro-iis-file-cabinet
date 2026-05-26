@@ -1,41 +1,74 @@
-# Retro IIS File Cabinet
+# 复古 IIS 文件柜
 
-A single-page ASP.NET Web Forms file cabinet for IIS 8+.
+这是一个部署在 IIS 8+ 上的单文件 ASP.NET Web Forms 文件管理页面。
 
-It provides a retro-style browser UI for:
+页面风格偏复古，适合在内网里临时提供一个简单的文件柜，支持上传、下载、新建文件夹和删除文件。
 
-- File listing
-- File download
-- Chunked upload up to 10 GB
-- Folder creation
-- File and folder deletion
+## 功能
 
-## Files
+- 浏览文件和文件夹
+- 下载文件
+- 上传文件
+- 支持最大 10 GB 文件上传
+- 大文件自动分片上传，每片 64 MB
+- 新建文件夹
+- 删除文件或文件夹
+- 中文页面
 
-- `default.aspx` - self-contained file manager page.
-- `web.config` - IIS/ASP.NET upload and default document configuration.
+## 文件说明
 
-## Deploy
+- `default.aspx`：文件柜主页面，包含前端界面和后端逻辑。
+- `web.config`：IIS / ASP.NET 配置，包含上传大小、默认文档等设置。
 
-Create an IIS application or folder, then copy these files into it:
+## 部署方法
+
+在 IIS 站点下创建一个目录，例如：
+
+```text
+C:\inetpub\wwwroot\a
+```
+
+把下面两个文件复制进去：
 
 ```text
 default.aspx
 web.config
 ```
 
-The app stores shared files under:
+然后在该目录下创建文件存储目录：
 
 ```text
-files/
+C:\inetpub\wwwroot\a\files
 ```
 
-Make sure the IIS application pool identity can modify that folder. For example:
+文件柜会把上传的文件保存到 `files` 目录中。
+
+## 权限设置
+
+需要给 IIS 应用池或 IIS 用户组写入 `files` 目录的权限。例如：
 
 ```bat
 icacls C:\inetpub\wwwroot\a\files /grant *S-1-5-32-568:(OI)(CI)(M)
 ```
 
-## Notes
+如果页面能打开但上传失败，通常是 `files` 目录没有写入权限。
 
-Large uploads are split in the browser into 64 MB chunks and reassembled on the server. The configured single-request limit is 200 MB, while the UI-level file limit is 10 GB.
+## 访问
+
+如果部署目录是 `/a`，访问地址类似：
+
+```text
+http://服务器地址/a
+```
+
+页面会自动显示文件列表，并提供上传、新建文件夹、下载和删除按钮。
+
+## 上传说明
+
+浏览器会把大文件切成 64 MB 的小块逐个上传，服务器收到最后一块后合并成完整文件。
+
+页面层面的上传上限是 10 GB。`web.config` 中单次请求限制保持在 200 MB 左右，用来配合分片上传，而不是一次性提交整个大文件。
+
+## 注意事项
+
+这个工具适合内网临时文件分发或小范围共享。公开到公网前，建议增加登录认证、删除权限控制和审计日志。
